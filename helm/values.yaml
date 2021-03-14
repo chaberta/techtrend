@@ -8,8 +8,9 @@ service:
   type: ClusterIP
 
 image:
-  repository: chaberta70/techtrends
+  repository: techtrends
   tag: latest
+  pullPolicy: IfNotPresent
 
 replicaCount: 1
 
@@ -25,6 +26,8 @@ containerPort: 3111
 
 livenessProbe:
   path: /healthz
+  port: containerPort
 
 readinessProbe:
   path: /healthz
+  port: containerPort
