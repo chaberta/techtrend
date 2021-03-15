@@ -4,16 +4,17 @@ from flask import Flask, jsonify, json, render_template, request, url_for, redir
 from werkzeug.exceptions import abort
 from datetime import datetime
 import logging
+import sys
 # Function to get a database connection.
 # This function connects to database with the name `database.db`
-cnct_count = 0
+connection_count = 0
 
 
 def get_db_connection():
-    global cnct_count
+    global connection_count
     connection = sqlite3.connect('database.db')
     connection.row_factory = sqlite3.Row
-    cnct_count = cnct_count+1
+    connection_count = connection_count+1
     return connection
 
 # Function to get a post using its ID
@@ -104,7 +105,7 @@ def metrics():
     connection_count.close()
     posts_value = len(posts_count)
     response = {"post_count": posts_value,
-                "db_connection_count": cnct_count}
+                "db_connection_count": connection_count}
 
     return response
 
@@ -116,5 +117,11 @@ def log_message(msg):
 
 # start the application on port 3111
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    stderr_handler = logging.StreamHandler(sys.stderr)
+    handlers = [stderr_handler, stdout_handler]
+    format_output = '%(levelname)s: %(name)-2s - [%(asctime)s] - %(message)s'
+    logging.basicConfig(format=format_output,
+                        level=logging.DEBUG, handlers=handlers)
     app.run(host='0.0.0.0', port='3111')
+
